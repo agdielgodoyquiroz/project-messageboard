@@ -123,6 +123,34 @@ module.exports = function (app) {
     // Obtener un Thread con todas las replies
     .get(async (req, res) => {
 
+      try {
+
+        const { thread_id } = req.query;
+
+        const thread = await Thread.findById(thread_id)
+          .select("-delete_password -reported");
+
+        if (!thread) {
+          return res.status(404).send("Thread not found");
+        }
+
+        const result = thread.toObject();
+
+        result.replies = result.replies.map(reply => ({
+          _id: reply._id,
+          text: reply.text,
+          created_on: reply.created_on
+        }));
+
+        res.json(result);
+
+      } catch (err) {
+
+        console.error(err);
+        res.status(500).send("Server Error");
+
+      }
+
     })
 
     // Reportar Reply
