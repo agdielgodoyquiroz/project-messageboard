@@ -77,6 +77,23 @@ module.exports = function (app) {
     // Reportar Thread
     .put(async (req, res) => {
 
+      try {
+
+        const { thread_id } = req.body;
+
+        await Thread.findByIdAndUpdate(thread_id, {
+          reported: true
+        });
+
+        res.send("reported");
+
+      } catch (err) {
+
+        console.error(err);
+        res.status(500).send("Server Error");
+
+      }
+
     })
 
     // Eliminar Thread
@@ -180,6 +197,35 @@ module.exports = function (app) {
 
     // Reportar Reply
     .put(async (req, res) => {
+
+      try {
+
+        const { thread_id, reply_id } = req.body;
+
+        const thread = await Thread.findById(thread_id);
+
+        if (!thread) {
+          return res.status(404).send("Thread not found");
+        }
+
+        const reply = thread.replies.id(reply_id);
+
+        if (!reply) {
+          return res.status(404).send("Reply not found");
+        }
+
+        reply.reported = true;
+
+        await thread.save();
+
+        res.send("reported");
+
+      } catch (err) {
+
+        console.error(err);
+        res.status(500).send("Server Error");
+
+      }
 
     })
 
