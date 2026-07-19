@@ -82,6 +82,31 @@ module.exports = function (app) {
     // Eliminar Thread
     .delete(async (req, res) => {
 
+      try {
+
+        const { thread_id, delete_password } = req.body;
+
+        const thread = await Thread.findById(thread_id);
+
+        if (!thread) {
+          return res.send("incorrect password");
+        }
+
+        if (thread.delete_password !== delete_password) {
+          return res.send("incorrect password");
+        }
+
+        await Thread.findByIdAndDelete(thread_id);
+
+        res.send("success");
+
+      } catch (err) {
+
+        console.error(err);
+        res.status(500).send("Server Error");
+
+      }
+
     });
 
 
