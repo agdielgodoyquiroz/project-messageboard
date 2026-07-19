@@ -13,16 +13,19 @@ module.exports = function (app) {
 
         const { text, delete_password } = req.body;
         const board = req.params.board;
+        const now = new Date();
 
         const thread = new Thread({
           board,
           text,
-          delete_password
-        });
+          delete_password,
+          created_on: now,
+          bumped_on: now
+  });
 
-        await thread.save();
+    await thread.save();
 
-        res.redirect("/b/" + board + "/");
+      res.redirect("/b/" + board + "/");
 
       } catch (err) {
 
