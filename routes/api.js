@@ -186,6 +186,39 @@ module.exports = function (app) {
     // Eliminar Reply
     .delete(async (req, res) => {
 
+      try {
+
+        const { thread_id, reply_id, delete_password } = req.body;
+
+        const thread = await Thread.findById(thread_id);
+
+        if (!thread) {
+          return res.send("incorrect password");
+        }
+
+        const reply = thread.replies.id(reply_id);
+
+        if (!reply) {
+          return res.send("incorrect password");
+        }
+
+        if (reply.delete_password !== delete_password) {
+          return res.send("incorrect password");
+        }
+
+        reply.text = "[deleted]";
+
+        await thread.save();
+
+        res.send("success");
+
+      } catch (err) {
+
+        console.error(err);
+        res.status(500).send("Server Error");
+
+      }
+
     });
 
 };
